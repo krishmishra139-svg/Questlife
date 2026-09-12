@@ -4,6 +4,8 @@ A dark-fantasy, tavern-themed Life RPG web app. Turn your daily habits into
 quests, earn XP and gold, grow attributes, and level up your character.
 
 DEPLOYED URL : https://questlife-izfs.onrender.com
+ILLUSTRATION VIDEO : https://youtu.be/E3y9CJ2LywY
+
 ## Tech stack
 - Next.js 14 (App Router) + TypeScript
 - Supabase (Postgres + Auth, with Row Level Security)
