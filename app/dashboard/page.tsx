@@ -77,8 +77,8 @@ export default function Dashboard() {
     return ()=> clearInterval(t)
   }, [])
 
-  const saveChar = (nc: any) => { setChar(nc); localStorage.setItem(`questlife_character_${userId}`, JSON.stringify(nc)); localStorage.setItem('questlife_character', JSON.stringify(nc)); supabase.from('leaderboard').upsert({ user_id: userId, username: nc.name, level: nc.level, xp: nc.xp, gold: nc.gold, strength: nc.attributes.strength, streak: nc.streak, updated_at: new Date().toISOString() }, { onConflict: 'user_id' }).then(()=>{}) }
-  const saveQuests = (nq: any[]) => { setQuests(nq); localStorage.setItem(`questlife_quests_${userId}`, JSON.stringify(nq)); localStorage.setItem('questlife_quests', JSON.stringify(nq)) }
+ const saveChar = (nc: any) => { setChar(nc); localStorage.setItem(`questlife_character_${userId}`, JSON.stringify(nc)); supabase.from('leaderboard').upsert({ user_id: userId, username: nc.name, level: nc.level, xp: nc.xp, gold: nc.gold, strength: nc.attributes.strength, streak: nc.streak, updated_at: new Date().toISOString() }, { onConflict: 'user_id' }).then(()=>{}) }
+const saveQuests = (nq: any[]) => { setQuests(nq); localStorage.setItem(`questlife_quests_${userId}`, JSON.stringify(nq)); }
 
   useEffect(() => {
     const check = setInterval(()=> {
@@ -121,9 +121,8 @@ export default function Dashboard() {
       const authId = data.user?.id; if (!authId) { window.location.href = '/login'; return }
       setUserId(authId)
       const qKey = `questlife_quests_${authId}`; const cKey = `questlife_character_${authId}`
-      let q = JSON.parse(localStorage.getItem(qKey) || localStorage.getItem('questlife_quests') || '[]')
-      const cRaw = localStorage.getItem(cKey) || localStorage.getItem('questlife_character') || JSON.stringify({ name: data.user?.email?.split('@')[0] || 'Adventurer', bio: 'New adventurer ready to quest!', avatar: '', level: 1, xp: 0, gold: 50, streak: 1, lastStreakDate: '', attributes: { strength: 10, intelligence: 10, agility: 10 }, inventory: [], equipped: [], bossDefeated: 0, weeklyXP: [] })
-      const c = JSON.parse(cRaw)
+      let q = JSON.parse(localStorage.getItem(qKey) || '[]')
+const cRaw = localStorage.getItem(cKey) || JSON.stringify({ name: data.user?.email?.split('@')[0] || 'Adventurer', bio: 'New adventurer ready to quest!', avatar: '', level: 1, xp: 0, gold: 50, streak: 1, lastStreakDate: '', attributes: { strength: 10, intelligence: 10, agility: 10 }, inventory: [], equipped: [], bossDefeated: 0, weeklyXP: [] })
       if (!c.bossDefeated) c.bossDefeated = 0; if (!c.weeklyXP) c.weeklyXP = []; if (!c.equipped) c.equipped = []
       const today = getToday()
       if (c.lastStreakDate && c.lastStreakDate !== today && c.lastStreakDate !== getYesterday()) c.streak = 1
