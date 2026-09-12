@@ -73,7 +73,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     const t = setInterval(()=> setNow(new Date()), 1000)
-    if (typeof window!== 'undefined' && 'Notification' in window && Notification.permission === 'default') Notification.requestPermission()
+    if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'default') Notification.requestPermission()
     return ()=> clearInterval(t)
   }, [])
 
@@ -87,16 +87,16 @@ export default function Dashboard() {
       let changedChar = false
       let changedQuests = false
       quests.forEach((q:any)=> {
-        if (!q.dueDate ||!q.dueTime || q.penalized) return
+        if (!q.dueDate || !q.dueTime || q.penalized) return
         const due = new Date(`${q.dueDate}T${q.dueTime}`)
         const diff = due.getTime() - Date.now()
-        if (diff > 0 && diff < 5*60*1000 &&!q.notified) {
+        if (diff > 0 && diff < 5*60*1000 && !q.notified) {
           const msg = `⏰ "${q.title}" due at ${q.dueTime}! Complete or lose reward!`
           if ('Notification' in window && Notification.permission === 'granted') new Notification('Quest Due Soon!', { body: msg })
           newQuests = newQuests.map((qq:any)=> qq.id===q.id? {...qq, notified: true} : qq)
           changedQuests = true
         }
-        if (diff < 0 &&!q.penalized) {
+        if (diff < 0 && !q.penalized) {
           const d = DIFFICULTY[q.difficulty as keyof typeof DIFFICULTY] || DIFFICULTY.medium
           newChar.xp = Math.max(0, newChar.xp - d.xp)
           newChar.gold = Math.max(0, newChar.gold - d.gold)
@@ -122,11 +122,11 @@ export default function Dashboard() {
       setUserId(authId)
       const qKey = `questlife_quests_${authId}`; const cKey = `questlife_character_${authId}`
       let q = JSON.parse(localStorage.getItem(qKey) || localStorage.getItem('questlife_quests') || '[]')
-      const cRaw = localStorage.getItem(cKey) || localStorage.getItem('questlife_character') || JSON.stringify({ name: data.user.email?.split('@')[0] || 'Adventurer', bio: 'New adventurer ready to quest!', avatar: '', level: 1, xp: 0, gold: 50, streak: 1, lastStreakDate: '', attributes: { strength: 10, intelligence: 10, agility: 10 }, inventory: [], equipped: [], bossDefeated: 0, weeklyXP: [] })
+      const cRaw = localStorage.getItem(cKey) || localStorage.getItem('questlife_character') || JSON.stringify({ name: data.user?.email?.split('@')[0] || 'Adventurer', bio: 'New adventurer ready to quest!', avatar: '', level: 1, xp: 0, gold: 50, streak: 1, lastStreakDate: '', attributes: { strength: 10, intelligence: 10, agility: 10 }, inventory: [], equipped: [], bossDefeated: 0, weeklyXP: [] })
       const c = JSON.parse(cRaw)
       if (!c.bossDefeated) c.bossDefeated = 0; if (!c.weeklyXP) c.weeklyXP = []; if (!c.equipped) c.equipped = []
       const today = getToday()
-      if (c.lastStreakDate && c.lastStreakDate!== today && c.lastStreakDate!== getYesterday()) c.streak = 1
+      if (c.lastStreakDate && c.lastStreakDate !== today && c.lastStreakDate !== getYesterday()) c.streak = 1
       setQuests(q); setChar(c)
       localStorage.setItem(qKey, JSON.stringify(q)); localStorage.setItem(cKey, JSON.stringify(c))
       const { data: boardData } = await supabase.from('leaderboard').select('*').order('xp', { ascending: false }).limit(10)
@@ -142,41 +142,41 @@ export default function Dashboard() {
 
   const handleAdd = () => {
     if (!title.trim()) return alert('Title required')
-    if (!dueDate ||!dueTime) return alert('Please set date and time to complete quest')
+    if (!dueDate || !dueTime) return alert('Please set date and time to complete quest')
     const nq = { id: Date.now().toString(), title: title.trim(), category: cat, difficulty, icon: qIcon, dueDate, dueTime, repeat, notified: false, overdueNotified: false, penalized: false, createdAt: new Date().toISOString() }
-    saveQuests([nq,...quests]); setTitle(''); setDueDate(''); setDueTime(''); setShowAdd(false)
+    saveQuests([nq, ...quests]); setTitle(''); setDueDate(''); setDueTime(''); setShowAdd(false)
   }
 
   const handleComplete = (id: string) => {
     const quest = quests.find((q:any)=> q.id===id); if (!quest) return
     const d = DIFFICULTY[quest.difficulty as keyof typeof DIFFICULTY] || DIFFICULTY.medium
     const isPenalized = quest.penalized
-    let rewardXP = isPenalized? Math.floor(d.xp/2) : d.xp
-    let rewardGold = isPenalized? Math.floor(d.gold/2) : d.gold
+    let rewardXP = isPenalized ? Math.floor(d.xp/2) : d.xp
+    let rewardGold = isPenalized ? Math.floor(d.gold/2) : d.gold
     if (isPenalized) alert(`Late completion! Only +${rewardXP} XP +${rewardGold} Gold (half) because penalty already applied`)
     let newQuests; if (quest.repeat==='daily') { newQuests = quests.map((q:any)=> q.id===id? {...q, lastDone: getToday(), notified: false, overdueNotified: false, penalized: false} : q) } else if (quest.repeat==='weekly') { const next = new Date(); next.setDate(next.getDate()+7); newQuests = quests.map((q:any)=> q.id===id? {...q, dueDate: next.toISOString().split('T')[0], notified: false, overdueNotified: false, penalized: false} : q) } else { newQuests = quests.filter((q:any)=> q.id!==id) }
     saveQuests(newQuests)
     const today = getToday(); const yesterday = getYesterday(); let newStreak = char.streak
-    if (char.lastStreakDate!== today) { if (char.lastStreakDate === yesterday || char.lastStreakDate === '') newStreak = char.lastStreakDate? char.streak+1 : 1; else { const diffDays = Math.floor((new Date().getTime() - new Date(char.lastStreakDate).getTime())/(1000*60*60*24)); newStreak = diffDays===1? char.streak+1 : 1 } }
+    if (char.lastStreakDate !== today) { if (char.lastStreakDate === yesterday || char.lastStreakDate === '') newStreak = char.lastStreakDate ? char.streak+1 : 1; else { const diffDays = Math.floor((new Date().getTime() - new Date(char.lastStreakDate).getTime())/(1000*60*60*24)); newStreak = diffDays===1 ? char.streak+1 : 1 } }
     const newXp = char.xp + rewardXP; const newGold = char.gold + rewardGold; const newLevel = Math.floor(newXp/100)+1
     const attrs = {...char.attributes}; if (quest.category==='strength') attrs.strength++; else if (quest.category==='intellect') attrs.intelligence++; else attrs.agility++
     const weeklyXP = [...(char.weeklyXP||[]), { date: today, xp: rewardXP }].slice(-30)
     let newBossHP = bossHP -1; if (newBossHP<=0) { newBossHP = 10; alert('👹 BOSS DEFEATED! +200 Gold!'); saveChar({...char, gold: newGold+200}) }
-    const oldRank = getRank(char.level).name; const newR = getRank(newLevel); if (oldRank!== newR.name) alert(`🎉 RANK UP! ${oldRank} → ${newR.name} ${newR.icon}`)
+    const oldRank = getRank(char.level).name; const newR = getRank(newLevel); if (oldRank !== newR.name) alert(`🎉 RANK UP! ${oldRank} → ${newR.name} ${newR.icon}`)
     const nc = {...char, xp: newXp, gold: newGold, level: newLevel, attributes: attrs, streak: newStreak, lastStreakDate: today, weeklyXP }
     saveChar(nc); setBossHP(newBossHP)
   }
 
   const handleDelete = (id: string) => { if (!confirm('Delete this quest?')) return; saveQuests(quests.filter((q:any)=> q.id!==id)) }
   const openEditQuest = (q:any) => { setEditingQuest(q); setEditQTitle(q.title); setEditQCat(q.category); setEditQDiff(q.difficulty || 'medium'); setEditQIcon(q.icon || '💪'); setEditQDue(q.dueDate || ''); setEditQTime(q.dueTime || ''); setEditQRepeat(q.repeat || 'none'); setShowEditQuest(true) }
-  const handleUpdateQuest = () => { if (!editQTitle.trim()) return alert('Title required'); if (!editQDue ||!editQTime) return alert('Set date and time'); const updated = quests.map((q:any)=> q.id===editingQuest.id? {...q, title: editQTitle.trim(), category: editQCat, difficulty: editQDiff, icon: editQIcon, dueDate: editQDue, dueTime: editQTime, repeat: editQRepeat, notified: false, overdueNotified: false, penalized: false } : q); saveQuests(updated); setShowEditQuest(false); setEditingQuest(null) }
+  const handleUpdateQuest = () => { if (!editQTitle.trim()) return alert('Title required'); if (!editQDue || !editQTime) return alert('Set date and time'); const updated = quests.map((q:any)=> q.id===editingQuest.id? {...q, title: editQTitle.trim(), category: editQCat, difficulty: editQDiff, icon: editQIcon, dueDate: editQDue, dueTime: editQTime, repeat: editQRepeat, notified: false, overdueNotified: false, penalized: false } : q); saveQuests(updated); setShowEditQuest(false); setEditingQuest(null) }
 
   const buyItem = (id: string, cost: number) => { if (char.gold < cost || char.inventory.includes(id)) return; if (id==='potion') { saveChar({...char, gold: char.gold - cost, xp: char.xp + 100, level: Math.floor((char.xp+100)/100)+1}); return } saveChar({...char, gold: char.gold - cost, inventory: [...char.inventory, id] }) }
   const toggleEquip = (id: string) => { const isEq = char.equipped?.includes(id); let ne, na = {...char.attributes} as any; if (isEq) { ne = char.equipped.filter((x:string)=> x!==id); if(id==='sword') na.strength-=5; if(id==='shield') na.agility-=5; if(id==='crown') na.intelligence-=10 } else { ne = [...(char.equipped||[]), id]; if(id==='sword') na.strength+=5; if(id==='shield') na.agility+=5; if(id==='crown') na.intelligence+=10 } saveChar({...char, equipped: ne, attributes: na}) }
   const useItem = (id: string) => { if(id==='gem'){ if(!confirm('Use Gem +50 Gold?')) return; saveChar({...char, gold: char.gold+50, inventory: char.inventory.filter((x:string)=>x!==id), equipped: char.equipped.filter((x:string)=>x!==id)}) } else if(id==='potion'){ saveChar({...char, xp: char.xp+100, level: Math.floor((char.xp+100)/100)+1, inventory: char.inventory.filter((x:string)=>x!==id)}) } else toggleEquip(id) }
 
   const getTimeLeft = (q:any) => {
-    if (!q.dueDate ||!q.dueTime) return null
+    if (!q.dueDate || !q.dueTime) return null
     const due = new Date(`${q.dueDate}T${q.dueTime}`); const diff = due.getTime() - now.getTime()
     if (diff <= 0) return { text: `OVERDUE -${q.penalty?.xp || DIFFICULTY[q.difficulty as keyof typeof DIFFICULTY]?.xp} XP`, color: 'text-red-400 font-black animate-pulse', overdue: true }
     const h = Math.floor(diff / (1000*60*60)); const m = Math.floor((diff % (1000*60*60))/(1000*60)); const s = Math.floor((diff % (1000*60))/1000)
@@ -193,7 +193,6 @@ export default function Dashboard() {
       style={{ backgroundImage: `url('/dashboard-bg.jpg')` }} 
       className="min-h-screen w-full bg-cover bg-center bg-fixed bg-no-repeat text-white"
     >
-      {/* 45% dark tint overlay so text and cards remain legible over the background image */}
       <div className="min-h-screen w-full bg-black/45 backdrop-blur-[1px] p-4">
         <div className="max-w-[1300px] mx-auto">
           <div className="flex justify-between items-center mb-5">
