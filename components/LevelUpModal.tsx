@@ -7,11 +7,10 @@ import confetti from "canvas-confetti";
 import { useCharacterStore } from "@/store/useCharacterStore";
 
 export default function LevelUpModal() {
-  const showLevelUp = useCharacterStore((s) => s.showLevelUp);
-  const lastLevel = useCharacterStore((s) => s.lastLevel);
-  const attributePoints = useCharacterStore((s) => s.attributePoints);
-  const dismissLevelUp = useCharacterStore((s) => s.dismissLevelUp);
-
+  const showLevelUp = useCharacterStore((s: any) => s.showLevelUp);
+const lastLevel = useCharacterStore((s: any) => s.lastLevel);
+const attributePoints = useCharacterStore((s: any) => s.attributePoints);
+const dismissLevelUp = useCharacterStore((s: any) => s.dismissLevelUp);
   const particles = useMemo(
     () =>
       Array.from({ length: 24 }).map((_, i) => ({
