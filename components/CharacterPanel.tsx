@@ -16,7 +16,7 @@ export default function CharacterPanel({ character }: any) {
     <div className="bg-[#1e3a5f]/80 backdrop-blur rounded-[20px] p-6 border border-white/10">
       <div className="flex gap-4">
         <div className="w-20 h-20 bg-[#fde047] rounded-xl flex items-center justify-center">
-          <PixelAvatar level={level} />
+         <PixelAvatar />
         </div>
         <div className="flex-1">
           {isEditing? (
